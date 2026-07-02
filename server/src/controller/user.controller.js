@@ -17,7 +17,7 @@ const generateAccessAndRefreshToken = asyncHandler(async (userId) => {
   const refreshToken = await user.generateRefreshToken();
 
   this.refreshToken = refreshToken;
-  await user.save({validateBeforeSave : false});
+  await user.save({ validateBeforeSave: false });
 
   return { accessToken, refreshToken };
 });
@@ -54,14 +54,58 @@ export const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
-  const { accessToken , refreshToken } = generateAccessAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = generateAccessAndRefreshToken(user._id);
 
-  const createUser = await User.findOne(user._id).select(" -password -refershToken ");
-  if(!createdUser){
-    throw new ApiError(400 , "Something went wrong while creating user...")
+  const createUser = await User.findOne(user._id).select(
+    " -password -refershToken ",
+  );
+  if (!createdUser) {
+    throw new ApiError(400, "Something went wrong while creating user...");
   }
 
-  res.status(201).json(new ApiResponse(201 , {data : createdUser} , "User created successfully..."))
+  res
+    .status(201)
+    .cookie("accessToken" , accessToken , cookieOptions)
+    .cookie("refreshToken" , refreshToken , cookieOptions)
+    .json(
+      new ApiResponse(
+        201,
+        { data: createdUser },
+        "User created successfully...",
+      ),
+    );
+});
 
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new ApiError(400, "Fill all the fields...");
+  }
+
+  const user = await User.findOne(email);
+  if (!user) {
+    throw new ApiError(400, "User with email is not registered...");
+  }
+  
+  const { accessToken, refreshToken } = generateAccessAndRefreshToken(user._id);
+
+  const loggedInUser = await User.findOne(user._id).select(
+    " -password -refershToken ",
+  );
+  if (!createdUser) {
+    throw new ApiError(400, "Something went wrong while creating user...");
+  }
+
+  res
+    .status(201)
+    .cookie("accessToken" , accessToken , cookieOptions)
+    .cookie("refreshToken" , refreshToken , cookieOptions)
+    .json(
+      new ApiResponse(
+        201,
+        { data: loggedInUser },
+        "User logged In successfully...",
+      ),
+    );
 
 });
