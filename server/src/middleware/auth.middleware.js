@@ -4,5 +4,38 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 
 export const verifyJWT = asyncHandler(async (req , res) => {
+    try {
 
+        const token = req.cookies?.accessToken || req.headers("Authorization").raplace("Bearer ");
+        if(!token){
+            throw new ApiError(401 , "Unauthorized request: Token missing...")
+        }
+
+        const decodedToken = await jwt.verify(token , process.env.REFRESH_TOKEN_SECRET);
+        if(!decodedToken || !decodedToken._id){
+            throw new ApiError(401 , "Invalid Token. Please Login Again...")  
+        }
+
+        const user = user.findById(decodedToken._id).select("-password -refreshToken");
+        if(!user){
+            throw new ApiError(401 , "Invalid access token: user not found....")
+        }
+
+        req.user = user;
+        next();
+        
+    } catch (error) {
+        if (error instanceof ApiError) {
+      throw error;
+    }
+
+    if (error.name === "TokenExpiredError") {
+      throw new ApiError(401, "Access token expired. Please refresh token.");
+    }
+    if (error.name === "JsonWebTokenError") {
+      throw new ApiError(401, "Invalid token. Please log in again.");
+    }
+
+    throw new ApiError(401, "Unauthorized. Please log in.");
+    }
 });
