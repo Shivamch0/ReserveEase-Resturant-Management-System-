@@ -10,10 +10,12 @@ app.use(cookieParser());
 app.use(express.json({limit : '16kb'}));
 app.use(urlencoded());
 
-import userRouter from './routes/user.route.js'
+import userRouter from './routes/user.route.js';
+import tableRoute from './routes/table.route.js';
 import errorHandler from './middleware/error.middleware.js';
 
 app.use('/api/v1/user' , userRouter);
+app.use('/api/v1/table' , tableRoute);
 
 
 app.use(errorHandler)
