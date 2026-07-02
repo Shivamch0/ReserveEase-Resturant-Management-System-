@@ -17,7 +17,7 @@ const generateAccessAndRefreshToken = asyncHandler(async (userId) => {
   const accessToken = await user.generateAccessToken();
   const refreshToken = await user.generateRefreshToken();
 
-  this.refreshToken = refreshToken;
+  user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
 
   return { accessToken, refreshToken };
@@ -44,7 +44,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Fill all the fields...");
   }
 
-  const existedUser = await User.findOne(email);
+  const existedUser = await User.findOne({email});
   if (existedUser) {
     throw new ApiError(400, "User with this email is already exists...");
   }
@@ -55,10 +55,10 @@ export const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
-  const { accessToken, refreshToken } = generateAccessAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
-  const createUser = await User.findOne(user._id).select(
-    " -password -refershToken ",
+  const createUser = await User.findById(user._id).select(
+    " -password -refreshToken ",
   );
   if (!createdUser) {
     throw new ApiError(400, "Something went wrong while creating user...");
@@ -83,15 +83,15 @@ export const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Fill all the fields...");
   }
 
-  const user = await User.findOne(email);
+  const user = await User.findOne({email});
   if (!user) {
     throw new ApiError(400, "User with email is not registered...");
   }
 
-  const { accessToken, refreshToken } = generateAccessAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
-  const loggedInUser = await User.findOne(user._id).select(
-    " -password -refershToken ",
+  const loggedInUser = await User.findById(user._id).select(
+    " -password -refreshToken ",
   );
   if (!createdUser) {
     throw new ApiError(400, "Something went wrong while creating user...");
@@ -113,7 +113,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, {
     $set: {
-      refereshToken: undefined,
+      refreshToken: undefined,
     },
   });
 
@@ -132,7 +132,7 @@ export const currentUser = asyncHandler(async (req, res) => {
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken =
-    req.cookies.refereshToken || req.body.refreshToken;
+    req.cookies.refreshToken || req.body.refreshToken;
   if (!incomingRefreshToken) {
   }
 

@@ -22,6 +22,10 @@ const userSchema = new Schema({
         enum : ["customer" , "admin"],
         default : 'customer'
     },
+    refreshToken: {
+        type : String,
+        required : true
+    }
 } , {timestamps : true});
 
 userSchema.pre("save" , async function () {
