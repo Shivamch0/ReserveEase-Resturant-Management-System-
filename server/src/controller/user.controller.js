@@ -91,6 +91,11 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if(!isPasswordValid){
+    throw new ApiError(401 , "Incorrect password...")
+  }
+
   const loggedInUser = await User.findById(user._id).select(
     " -password -refreshToken ",
   );
@@ -120,8 +125,8 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .cookie("accessToken", clearCookieOptions)
-    .cookie("refreshToken", clearCookieOptions)
+    .clearCookie("accessToken", clearCookieOptions)
+    .clearCookie("refreshToken", clearCookieOptions)
     .json(new ApiResponse(201, {}, "User logged Out successfully..."));
 });
 

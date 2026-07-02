@@ -7,7 +7,7 @@ import { ApiError } from '../utils/ApiError.js';
 export const verifyJWT = asyncHandler(async (req , res , next) => {
     try {
 
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ");
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer " , "");
         if(!token){
             throw new ApiError(401 , "Unauthorized request: Token missing...")
         }
@@ -40,3 +40,9 @@ export const verifyJWT = asyncHandler(async (req , res , next) => {
     throw new ApiError(401, "Unauthorized. Please log in.");
     }
 });
+
+export const verifyAdmin = asyncHandler(async (req , res , next) => {
+    if(req.user?.role !== 'admin') throw new ApiError(403 , "Admin Access only...")
+
+    next();
+})
