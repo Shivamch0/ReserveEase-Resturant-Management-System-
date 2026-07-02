@@ -12,7 +12,7 @@ const reservationSchema = new Schema(
       ref: "Table",
       required: true,
     },
-    resevationDate: {
+    reservationDate: {
       type: Date,
       required: true,
     },

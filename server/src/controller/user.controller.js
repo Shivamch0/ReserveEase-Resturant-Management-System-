@@ -89,12 +89,12 @@ export const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User with email is not registered...");
   }
 
-  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
-
   const isPasswordValid = await user.isPasswordCorrect(password);
   if(!isPasswordValid){
     throw new ApiError(401 , "Incorrect password...")
   }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
   const loggedInUser = await User.findById(user._id).select(
     " -password -refreshToken ",
@@ -138,7 +138,7 @@ export const currentUser = asyncHandler(async (req, res) => {
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken =
-    req.cookies.refreshToken || req.body.refreshToken;
+    req.cookies?.refreshToken || req.body.refreshToken;
   if (!incomingRefreshToken) {
     throw new ApiError(401, "Refresh token missing...");
   }
