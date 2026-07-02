@@ -1,12 +1,13 @@
 import jwt from 'jsonwebtoken';
+import { User } from '../model/user.model.js';
 
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 
-export const verifyJWT = asyncHandler(async (req , res) => {
+export const verifyJWT = asyncHandler(async (req , res , next) => {
     try {
 
-        const token = req.cookies?.accessToken || req.headers("Authorization").raplace("Bearer ");
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ");
         if(!token){
             throw new ApiError(401 , "Unauthorized request: Token missing...")
         }
@@ -16,7 +17,7 @@ export const verifyJWT = asyncHandler(async (req , res) => {
             throw new ApiError(401 , "Invalid Token. Please Login Again...")  
         }
 
-        const user = user.findById(decodedToken._id).select("-password -refreshToken");
+        const user = await User.findById(decodedToken._id).select("-password -refreshToken");
         if(!user){
             throw new ApiError(401 , "Invalid access token: user not found....")
         }
