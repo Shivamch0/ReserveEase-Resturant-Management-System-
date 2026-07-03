@@ -27,14 +27,28 @@ const reservationSchema = new Schema(
     guests: {
       type: Number,
       required: true,
+      min: 1,
     },
     status: {
       type: String,
-      enum: ["Booked", "Cancelled"],
+      enum: ["Booked", "Cancelled" , "Completed"],
       default: "Booked",
     },
+    notes : {
+      type : string,
+      trim : true
+    }
   },
   { timestamps: true },
 );
 
+reservationSchema.index({
+  table: 1,
+  reservationDate: 1,
+});
+
+
+reservationSchema.index({
+  customer: 1,
+});
 export const Reservation = model("Reservation", reservationSchema);
