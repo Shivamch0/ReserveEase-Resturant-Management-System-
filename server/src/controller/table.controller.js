@@ -1,4 +1,5 @@
 import { Table } from "../model/table.model.js";
+import { Reservation } from "../model/reservation.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -127,3 +128,63 @@ export const updateTables = asyncHandler(async (req, res) => {
     )
   );
 });
+
+export const tempararyDeleteTable = asyncHandler(async (req , res) => {
+    const { id : tableId} = req.params;
+    if (!tableId) {
+    throw new ApiError(400, "Table ID is required.");
+  }
+
+  const existingTable = await Table.findById(tableId);
+
+  if (!existingTable) {
+    throw new ApiError(404, "Table not found.");
+  }
+
+  const table = await Table.findByIdAndUpdate(tableId , {
+    $set : {
+        isActive : false
+    }
+  } , {new : true})
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      table,
+      "Table deleted successfully."
+    )
+  );
+
+})
+
+export const permanentDeleteTable = asyncHandler(async (req , res) => {
+    const { id : tableId} = req.params;
+    if (!tableId) {
+    throw new ApiError(400, "Table ID is required.");
+  }
+
+  const existingTable = await Table.findById(tableId);
+
+  if (!existingTable) {
+    throw new ApiError(404, "Table not found.");
+  }
+
+  const reservationExists = await Reservation.findOne({
+    table : tableId,
+  });
+
+  if(reservationExists){
+    throw new ApiError(409 , "Cannot delete this table because reservations exists for this table...")
+  }
+
+  const table = await Table.findByIdAndDelete(tableId)  
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      table,
+      "Table deleted successfully."
+    )
+  );
+
+})
