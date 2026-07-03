@@ -91,13 +91,13 @@ export const getCustomerReservations = asyncHandler(async (req, res) => {
 
   const reservations = await Reservation.find({
     customer : user._id
-  })
+  }).populate("table")
 
   return res.status(200).json(new ApiResponse(200 , reservations , "Customer reservations fetched successfully..."))
 });
 
 export const getAllReservations = asyncHandler(async(req , res) => {
-    const reservations = await Reservation.find().sort({reservationDate: 1});
+    const reservations = await Reservation.find().sort({reservationDate: 1}).populate("table").populate("customer" , "userName");
     return res.status(200).json(new ApiResponse(200 , reservations , "All reservations fetched successfully..."))
 })
 
