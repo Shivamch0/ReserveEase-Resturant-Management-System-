@@ -30,8 +30,6 @@ export const createReservation = asyncHandler(async (req, res) => {
     throw new ApiError(400, "No Available Tables found...");
   }
 
-  res.status(200).json(new ApiResponse(201, {}, "Hello"));
-
   let assignedTable = null;
 
   for (const table of tables) {
@@ -42,7 +40,7 @@ export const createReservation = asyncHandler(async (req, res) => {
     });
 
     const hasOverlap = reservedTables.some((reserve) => {
-      return startTime > reserve.endTime && endTime > reserve.startTime;
+      return startTime < reserve.endTime && endTime > reserve.startTime;
     });
 
     if (!hasOverlap) {
@@ -68,5 +66,5 @@ export const createReservation = asyncHandler(async (req, res) => {
     notes : notes || ""
   })
 
-  return res.status(201).json(new ApiResponse(201 , "Table reserved successfully..."))
+  return res.status(201).json(new ApiResponse(201 , reservation ,  "Table reserved successfully..."))
 });
