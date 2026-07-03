@@ -129,7 +129,7 @@ export const updateTables = asyncHandler(async (req, res) => {
   );
 });
 
-export const tempararyDeleteTable = asyncHandler(async (req , res) => {
+export const deactivateTable = asyncHandler(async (req , res) => {
     const { id : tableId} = req.params;
     if (!tableId) {
     throw new ApiError(400, "Table ID is required.");
