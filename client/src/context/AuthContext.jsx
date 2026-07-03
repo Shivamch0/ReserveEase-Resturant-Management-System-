@@ -11,12 +11,9 @@ const api = axios.create({
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-
   const [tables, setTables] = useState([]);
-
   const [reservations, setReservations] = useState([]);
-
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const checkSession = async () => {
     try {
@@ -59,25 +56,20 @@ export const AuthProvider = ({ children }) => {
     loadData();
   }, [user]);
 
-  useEffect(() => {
-    localStorage.setItem(
-      RESERVATIONS_STORAGE_KEY,
-      JSON.stringify(reservations),
-    );
-  }, [reservations]);
-
-  const login = async ({ email, password }) => {
+  const login = async (email, password) => {
     try {
       const response = await api.post("/users/login", { email, password });
       const info = response.data.data;
       setUser(info);
+      toast.success(`Welcome back, ${info.userName}!`);
       return info;
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Login failed");
+      throw error;
     }
   };
 
-  const register = async ({ userName, email, password }) => {
+  const register = async (userName, email, password) => {
     try {
       const response = await api.post("/users/register", {
         userName,
@@ -86,9 +78,11 @@ export const AuthProvider = ({ children }) => {
       });
       const info = response.data.data;
       setUser(info);
+      toast.success("Account created successfully!");
       return info;
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Registration failed");
+      throw error;
     }
   };
 
@@ -96,19 +90,21 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post("/users/logout");
       setUser(null);
+      toast.success("Logged out successfully");
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to log out");
     }
   };
 
-  const addTable = async ({ tableNumber, capacity }) => {
+  const addTable = async (tableNumber, capacity) => {
     try {
       const response = await api.post("/tables", { tableNumber, capacity });
       const newTable = response.data.data;
       setTables((prev) => [...prev, newTable]);
+      toast.success("Table added successfully!");
       return newTable;
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to add table");
     }
   };
 
@@ -118,8 +114,9 @@ export const AuthProvider = ({ children }) => {
       setTables((prev) =>
         prev.map((t) => (t._id === id ? { ...t, capacity, isActive } : t)),
       );
+      toast.success("Table updated successfully!");
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to update table");
     }
   };
 
@@ -127,8 +124,9 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.delete(`/tables/${id}`);
       setTables((prev) => prev.filter((t) => t._id !== id));
+      toast.success("Table deleted successfully!");
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to delete table");
     }
   };
 
@@ -148,52 +146,58 @@ export const AuthProvider = ({ children }) => {
         notes,
       });
       const newRes = response.data.data;
-      setReservations(prev => [...prev , newRes]);
+      setReservations((prev) => [...prev, newRes]);
+      toast.success("Table reserved successfully!");
       return newRes;
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Booking failed");
+      throw error;
     }
   };
 
   const cancelReservation = async (id) => {
     try {
-      await api.patch(`/reservations/${id}` , {status : "Cancelled"});
-      setReservations(prev => prev.map(r => r._id === id ? {...r , status : "Cancelled"} : r));
+      await api.patch(`/reservations/${id}`, { status: "Cancelled" });
+      setReservations((prev) =>
+        prev.map((r) => (r._id === id ? { ...r, status: "Cancelled" } : r)),
+      );
+      toast.success("Reservation cancelled successfully!");
     } catch (error) {
-      console.log(error)
+      toast.error("Failed to cancel reservation");
     }
   };
 
-  const updateReservationStatus  = async (id, status) => {
-   try {
-    const response = await api.patch(`/reservations/${id}` , {status});
-    const updatedRes = response.data.data;
-    setReservations(prev => prev.map(r => r._id === id ? updatedRes : r))
-   } catch (error) {
-    console.log(error)
-   }
+  const updateReservationStatus = async (id, status) => {
+    try {
+      const response = await api.patch(`/reservations/${id}`, { status });
+      const updatedRes = response.data.data;
+      setReservations((prev) =>
+        prev.map((r) => (r._id === id ? updatedRes : r)),
+      );
+      toast.success("Reservation status updated!");
+    } catch (error) {
+      toast.error("Failed to update reservation");
+    }
   };
 
   const value = {
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        tables,
-        reservations,
-        addTable,
-        updateTable,
-        deleteTable,
-        createReservation,
-        cancelReservation,
-        updateReservationStatus ,
-      }
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    tables,
+    reservations,
+    addTable,
+    updateTable,
+    deleteTable,
+    createReservation,
+    cancelReservation,
+    updateReservationStatus,
+  };
 
   return (
-    <AuthContext.Provider
-      value={value}
-    >
+    <AuthContext.Provider value={value}>
       {!loading && children}
     </AuthContext.Provider>
   );

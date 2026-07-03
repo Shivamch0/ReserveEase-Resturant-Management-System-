@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useReservation } from "../../hooks/useReservation";
 import { Calendar, User, Clock, UtensilsCrossed, ArrowRight } from "lucide-react";
@@ -7,6 +7,7 @@ import { Calendar, User, Clock, UtensilsCrossed, ArrowRight } from "lucide-react
 export const Dashboard = () => {
   const { user } = useAuth();
   const { reservations } = useReservation();
+  const navigate = useNavigate();
 
   const myReservations = reservations.filter((r) => r.customer === user?._id);
   const activeBookings = myReservations.filter((r) => r.status === "Booked").length;
@@ -22,7 +23,10 @@ export const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass p-5 rounded-2xl border border-white/5 flex items-center space-x-4">
+        <div
+          onClick={() => navigate("/customer/reservations", { state: { filter: "All" } })}
+          className="glass p-5 rounded-2xl border border-white/5 flex items-center space-x-4 cursor-pointer hover:border-gold-light/20 transition-all"
+        >
           <div className="p-3.5 rounded-xl bg-gold-light/10 text-gold-light">
             <Calendar size={20} />
           </div>
@@ -32,7 +36,10 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        <div className="glass p-5 rounded-2xl border border-white/5 flex items-center space-x-4">
+        <div
+          onClick={() => navigate("/customer/reservations", { state: { filter: "Booked" } })}
+          className="glass p-5 rounded-2xl border border-white/5 flex items-center space-x-4 cursor-pointer hover:border-gold-light/20 transition-all"
+        >
           <div className="p-3.5 rounded-xl bg-emerald-500/10 text-emerald-400">
             <Clock size={20} />
           </div>
@@ -42,7 +49,10 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        <div className="glass p-5 rounded-2xl border border-white/5 flex items-center space-x-4">
+        <div
+          onClick={() => navigate("/customer/reservations", { state: { filter: "Completed" } })}
+          className="glass p-5 rounded-2xl border border-white/5 flex items-center space-x-4 cursor-pointer hover:border-gold-light/20 transition-all"
+        >
           <div className="p-3.5 rounded-xl bg-blue-500/10 text-blue-400">
             <UtensilsCrossed size={20} />
           </div>

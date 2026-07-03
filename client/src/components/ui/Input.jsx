@@ -26,6 +26,11 @@ export const Input = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          onClick={(e) => {
+            if (type === "date" && typeof e.target.showPicker === "function") {
+              e.target.showPicker();
+            }
+          }}
           className={`w-full bg-dark-bg border border-white/10 rounded-xl py-2.5 text-white text-xs outline-none focus:border-gold-light/50 focus:ring-1 focus:ring-gold-light/30 transition-all font-sans ${
             Icon ? "pl-10 pr-4" : "px-3.5"
           }`}

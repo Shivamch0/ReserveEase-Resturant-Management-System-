@@ -60,3 +60,20 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #45a29e;
 }
+
+input[type="date"] {
+  color-scheme: dark;
+}
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) sepia(1) saturate(5) hue-rotate(15deg);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+::-webkit-calendar-picker-indicator:hover {
+  background: rgba(245, 176, 65, 0.15);
+  filter: invert(1);
+}
