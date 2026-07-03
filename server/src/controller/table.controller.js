@@ -26,25 +26,30 @@ export const getTableById = asyncHandler(async(req , res) => {
 })
 
 export const addTable = asyncHandler(async (req , res) => {
-    const { tableNumber , capacity } = req.body;
-    if(!tableNumber || !capacity){
-        throw new ApiError(400 , "Fill the required fields...")
+    const tableNumber = Number(req.body.tableNumber);
+    const capacity = Number(req.body.capacity);
+
+    if(!Number.isNaN(tableNumber) || !Number.isNaN(capacity)){
+        throw new ApiError(400 , "Table number and capacity must be valid numbers...")
     }
-    if(capacity <= 0){
-        throw new ApiError(400 ,"The should be at least 1...")
-    }
+
+     if (!Number.isInteger(capacity) || capacity < 1 || capacity > 20) {
+    throw new ApiError(
+      400,
+      "Table capacity must be an integer between 1 and 20."
+    );
+  }
 
     const existedTable = await Table.findOne({tableNumber});
     if(existedTable){
-        throw new ApiError(409 , "Table with this number is already exists...")
+        throw new ApiError(409 , "Table with this number already exists...")
     }
 
     const table = await Table.create({
         tableNumber,
         capacity,
-        isActive
     });
 
-    return res.status(201).json(new ApiResponse(201 , {data : table} , "New Table Created..."))
+    return res.status(201).json(new ApiResponse(201 ,  table , "New Table Created Successfully..."))
 
 })
