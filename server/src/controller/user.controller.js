@@ -72,7 +72,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         201,
-        { data: createdUser },
+        createdUser,
         "User created successfully...",
       ),
     );
@@ -110,7 +110,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         201,
-        { data: loggedInUser },
+        loggedInUser,
         "User logged In successfully...",
       ),
     );
@@ -133,9 +133,10 @@ export const logoutUser = asyncHandler(async (req, res) => {
 });
 
 export const currentUser = asyncHandler(async (req, res) => {
+  const user = req.user;
   return res
     .status(201)
-    .json(new ApiResponse(201, { data: req.user }, "Current User fetched..."));
+    .json(new ApiResponse(201, user, "Current User fetched..."));
 });
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {

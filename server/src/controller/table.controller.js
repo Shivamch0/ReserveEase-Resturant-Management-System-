@@ -10,7 +10,7 @@ export const getAllTables = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, { data: tables }, "tables fetched successfully..."),
+      new ApiResponse(200, tables, "tables fetched successfully..."),
     );
 });
 
@@ -28,7 +28,7 @@ export const getTableById = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, { data: table }, "Table fetched successfully..."),
+      new ApiResponse(200, table, "Table fetched successfully..."),
     );
 });
 
