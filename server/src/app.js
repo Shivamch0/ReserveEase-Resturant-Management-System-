@@ -17,7 +17,7 @@ import errorHandler from './middleware/error.middleware.js';
 
 app.use('/api/v1/users' , userRouter);
 app.use('/api/v1/tables' , tableRoute);
-app.use('/api/v1/reservatoins' , reservationRouter);
+app.use('/api/v1/reservations' , reservationRouter);
 
 
 app.use(errorHandler)
