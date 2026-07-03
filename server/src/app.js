@@ -12,10 +12,12 @@ app.use(urlencoded());
 
 import userRouter from './routes/user.route.js';
 import tableRoute from './routes/table.route.js';
+import reservationRouter from './routes/reservation.route.js'
 import errorHandler from './middleware/error.middleware.js';
 
 app.use('/api/v1/users' , userRouter);
 app.use('/api/v1/tables' , tableRoute);
+app.use('/api/v1/reservatoins' , reservationRouter);
 
 
 app.use(errorHandler)

@@ -35,7 +35,7 @@ const reservationSchema = new Schema(
       default: "Booked",
     },
     notes : {
-      type : string,
+      type : String,
       trim : true
     }
   },

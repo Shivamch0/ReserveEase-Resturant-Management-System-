@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getAllTables , getTableById , addTable , updateTables , deactivateTable , permanentDeleteTable } from "../controller/table.controller.js";
-import { verifyJWT , verifyAdmin } from "../middleware/auth.middleware,js";
+import { verifyJWT , verifyAdmin } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
